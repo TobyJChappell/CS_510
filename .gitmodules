@@ -1,0 +1,6 @@
+[submodule "CS_510_Midterm_Project"]
+	path = CS_510_Midterm_Project
+	url = https://github.com/TobyJChappell/CS_510_Midterm_Project.git
+[submodule "CourseInfo"]
+	path = CourseInfo
+	url = https://github.com/CS510-Fall2021/CourseInfo.git
