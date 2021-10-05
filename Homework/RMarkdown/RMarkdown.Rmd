@@ -1,0 +1,52 @@
+---
+title: "RMarkdown"
+output: html_notebook
+---
+
+```{r}
+library(viridisLite)
+treecolors <- viridis(nlevels(Orange$Tree))
+treeshapes <- c(15,22,17,24,19)
+Orange$Tree <- factor(Orange$Tree, levels=1:5, ordered=T)
+
+# Label axes and create title
+plot(circumference~age, 
+     data = Orange,
+     main = "Circumference vs. Age",
+     xlab = "Age",
+     ylab = "Circumference",
+     type = "n")
+
+# Create line plot for each tree using a unique shape and color
+i <- 1
+for (l in unique(Orange$Tree)) {
+  lines(circumference[Orange$Tree == l]~age[Orange$Tree == l], 
+        data = Orange,
+        type = "b",
+        col = treecolors[i],
+        pch = treeshapes[i])
+  i <- i + 1
+}
+
+# Legend showing shape and color of each tree
+legend("topleft", 
+       legend=levels(Orange$Tree), 
+       col=treecolors,
+       pch=treeshapes, 
+       lty = rep(1,nlevels(Orange$Tree)))
+```
+
+```{r}
+library(ggplot2)
+library(viridis)
+treeshapes <- c(15,22,17,24,19)
+Orange$Tree <- factor(Orange$Tree, levels=1:5, ordered=T)
+
+ggplot(Orange, aes(x=age, y=circumference, color = Tree, shape = Tree)) +
+  geom_line() +
+  geom_point() + 
+  scale_shape_manual(values=treeshapes) +
+  scale_color_viridis(discrete=TRUE) +
+  labs(x="Age", y="Circumference", title="Circumference vs. Age") +
+  theme_bw()
+```
