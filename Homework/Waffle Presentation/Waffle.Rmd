@@ -1,0 +1,139 @@
+---
+title: "Waffle"
+output: html_notebook
+---
+
+Load necessary libraries. Installation is a little tricky with some of the packages and can differ based on machine.
+```{r setup}
+#devtools::install_git("https://git.rud.is/hrbrmstr/waffle.git")
+#install.packages("systemfonts") # may throw an error if on mac, try "brew install freetype"
+#install.packages("hrbrthemes", repos = c("https://cinc.rud.is", "https://cloud.r-project.org/"))
+library(waffle)
+library(hrbrthemes)
+library(extrafont)
+library(dplyr)
+library(ggthemes)
+```
+
+Plot a basic waffle plot
+```{r basic_example}
+parts <- c(80, 30, 20, 10)
+basic <- waffle(parts, rows = 8)
+ggsave("Images/BasicPlot.png", basic)
+basic
+```
+
+Plot a waffle plot given a data frame
+```{r data_frame_example}
+df <- data.frame(
+  parts = factor(rep(month.abb[1:3], 3), levels=month.abb[1:3]),
+  vals = c(10, 20, 30, 6, 14, 40, 30, 20, 10),
+  col = rep(c("blue", "black", "red"), 3),
+  fct = c(rep("Thing 1", 3),
+          rep("Thing 2", 3),
+          rep("Thing 3", 3))
+)
+
+data <- df %>%
+  count(parts, wt = vals) %>%
+  ggplot(aes(fill = parts, values = n)) +
+  geom_waffle(n_rows = 20, size = 0.33, colour = "white", flip = TRUE) +
+  scale_fill_manual(
+    name = NULL,
+    values = c("#a40000", "#c68958", "#ae6056"),
+    labels = c("Fruit", "Sandwich", "Pizza")
+  ) +
+  coord_equal() +
+  theme_ipsum_rc(grid="") +
+  theme_enhance_waffle()
+ggsave("Images/DataPlot.png", data)
+data
+```
+
+Install Font Awesome to your personal font folder. Location is displayed after running following code:
+```{r install_glyphs}
+install_fa_fonts()
+```
+
+View available glyphs from Font Awesome
+```{r available_glyphs}
+fa_list()
+```
+
+Load fonts into R
+```{r glyphs}
+extrafont::font_import()
+extrafont::loadfonts(quiet = TRUE)
+```
+
+Plot a waffle plot with glyphs
+```{r glyph_example}
+glyph <- df %>%
+  count(parts, wt = vals) %>%
+  ggplot(aes(label = parts, values = n)) +
+  geom_pictogram(n_rows = 10, aes(colour = parts), flip = TRUE, make_proportional = TRUE) +
+  scale_color_manual(
+    name = NULL,
+    values = c("#a40000", "#c68958", "#ae6056"),
+    labels = c("Fruit", "Sandwich", "Pizza")) +
+  scale_label_pictogram(
+    name = NULL,
+    values = c("apple-alt", "bread-slice", "pizza-slice"),
+    labels = c("Fruit", "Sandwich", "Pizza")  ) +
+  coord_equal() +
+  theme_ipsum_rc(grid="") +
+  theme_enhance_waffle() +
+  theme(legend.key.height = unit(2.25, "line")) +
+  theme(legend.text = element_text(size = 10, hjust = 0, vjust = 0.75))
+ggsave("Images/GlyphPlot.png", glyph)
+glyph
+```
+```{r scaled}
+storms %>% 
+  filter(year >= 2010) %>% 
+  count(year, status) -> storms_df
+
+scaled <- ggplot(storms_df, aes(fill = status, values = n)) +
+  geom_waffle(color = "white", size = .25, n_rows = 10, flip = TRUE) +
+  facet_wrap(~year, nrow = 1, strip.position = "bottom") +
+  scale_x_discrete() + 
+  scale_y_continuous(labels = function(x) x * 10,
+                     expand = c(0,0)) +
+  ggthemes::scale_fill_tableau(name=NULL) +
+  coord_equal() +
+  labs(
+    title = "Faceted Waffle Bar Chart",
+    subtitle = "{dplyr} storms data",
+    x = "Year",
+    y = "Count"
+  ) +
+  theme_minimal(base_family = "Roboto Condensed") +
+  theme(panel.grid = element_blank(), axis.ticks.y = element_line()) +
+  guides(fill = guide_legend(reverse = TRUE))
+ggsave("Images/ScaledPlot.png", scaled)
+scaled
+```
+
+Plot a waffle plot with a transparent background
+```{r transparent}
+platform <- data.frame("Platform"=c('Prime Video','Netlflix','Hulu','Disney+'),"Count"=c(12354,3560,903,554))
+platform$Platform <- factor(platform$Platform,levels=c('Prime Video','Netlflix','Hulu','Disney+'))
+
+transparent <- ggplot(platform,aes(fill = Platform, values = Count/10)) +
+  expand_limits(x=c(0,0), y=c(0,0)) +
+  coord_equal() +
+  labs(fill = NULL, colour = NULL) +
+  theme_ipsum_rc(grid="") +
+  theme_enhance_waffle() +
+  scale_fill_manual(values=c("grey60","grey75","grey90","#111E4F")) + 
+  geom_waffle(n_rows = 20, 
+              size = 0, 
+              radius = unit(1, "pt"),
+              height = 0.8, 
+              width = 0.8) +
+  theme(
+    legend.position = "bottom"
+  )
+ggsave("Images/TransparentPlot.png", transparent)
+transparent
+```

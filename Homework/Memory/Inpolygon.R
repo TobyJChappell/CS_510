@@ -1,0 +1,6 @@
+library(pracma)
+xp <- c(0.5, 0.75, 0.75, 0.5, 0.5)
+yp <- c(0.5, 0.5, 0.75, 0.75, 0.5)
+x <- c(0.6, 0.75, 0.6, 0.5)
+y <- c(0.5, 0.6, 0.75, 0.6)
+inpolygon(x, y, xp, yp, boundary = FALSE)
