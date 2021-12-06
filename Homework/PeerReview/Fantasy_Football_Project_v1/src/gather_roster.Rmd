@@ -1,0 +1,26 @@
+---
+title: "Gather Rosters"
+output: html_document
+---
+
+```{r}
+library(nflfastR)
+```
+
+#Gets each players name,team, ID, ect for the years you are interested in
+#Use same number as in gather_pbp. maximum is 20 and only takes integers.
+```{r}
+num_seasons=1
+start_season=2022-num_seasons
+```
+
+```{r}
+future::plan('multisession')
+rosters <- nflfastR::fast_scraper_roster(start_season:2021)
+```
+
+
+#Writes out the players info to a csv
+```{r}
+write.csv(rosters, "../data/full_roster.csv")
+```
